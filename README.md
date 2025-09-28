@@ -1,200 +1,139 @@
-# ScroogeCoin - C++ Implementation
+# ScroogeCoin C++ Implementation
 
-A robust C++ implementation of the ScroogeCoin cryptocurrency system, demonstrating advanced C++ programming concepts alongside blockchain fundamentals. Originally based on Princeton University's "Bitcoin and Cryptocurrency Technologies" course assignment, this implementation showcases modern C++ best practices.
+\<div align="center"\>
 
-## Overview
+\</div\>
 
-ScroogeCoin is a simplified cryptocurrency system where a central authority called "Scrooge" manages all transactions and maintains the blockchain ledger. This implementation demonstrates fundamental blockchain concepts including transaction validation, digital signatures, and UTXO (Unspent Transaction Output) management.
+This repository contains a C++ implementation of **ScroogeCoin**, a simplified, centralized cryptocurrency model based on an assignment from the "Bitcoin and Cryptocurrency Technologies" course. The project builds the core logic for a central authority, Scrooge, to process transactions, validate them against a set of rules, and maintain a public ledger.
 
-## Features
+-----
 
-- **Object-Oriented Design**: Clean C++ class hierarchy with proper encapsulation
-- **STL Integration**: Leverages C++ Standard Template Library for efficient data structures
-- **Memory Management**: Smart pointers and RAII principles for safe memory handling
-- **Template Programming**: Generic programming for flexible transaction handling
-- **Exception Safety**: Robust error handling using C++ exception mechanisms
-- **Centralized Authority**: Scrooge acts as the central authority for coin creation and validation
-- **Transaction Validation**: Comprehensive validation using C++ algorithms
-- **Digital Signatures**: Cryptographic verification with OpenSSL integration
-- **UTXO Pool Management**: Efficient tracking using STL containers
-- **Thread Safety**: Mutex-based synchronization for concurrent operations
+## 📜 Table of Contents
 
-## System Architecture
+  * [💡 Core Concepts](https://www.google.com/search?q=%23-core-concepts)
+  * [✨ Features](https://www.google.com/search?q=%23-features)
+  * [🌊 Process Flow Diagram](https://www.google.com/search?q=%23-process-flow-diagram)
+  * [📂 Project Structure](https://www.google.com/search?q=%23-project-structure)
+  * [⚙️ How to Build and Run](https://www.google.com/search?q=%23%EF%B8%8F-how-to-build-and-run)
+  * [🤝 Contributors](https://www.google.com/search?q=%23-contributors)
 
-### Key Components
+-----
 
-1. **Transaction**: Represents a transfer of coins between parties
-2. **UTXO Pool**: Manages the collection of unspent transaction outputs
-3. **Transaction Handler**: Validates and processes transactions
-4. **Scrooge**: The central authority managing the entire system
+## 💡 Core Concepts
 
-### Transaction Rules
+In ScroogeCoin, a central entity named Scrooge receives transactions, organizes them into blocks, validates them, and publishes the ledger.
 
-- Only Scrooge can create new coins
-- All transactions must be digitally signed by the coin owners
-- Transactions must reference valid unspent outputs
-- The sum of input values must equal or exceed the sum of output values
-- Double-spending is prevented through UTXO tracking
+  * **Transactions**: A transaction consists of inputs and outputs.
+      * ***Inputs*** claim outputs from previous transactions. Each input must contain a valid digital signature to prove ownership.
+      * ***Outputs*** specify a value and the public key of the recipient.
+  * **UTXO (Unspent Transaction Output)**: Represents a spendable coin. The collection of all current UTXOs is managed in a `UTXOPool`.
+  * **The Challenge**: Transactions within a single block can reference each other or attempt to spend the same output (a double-spend). This means transactions cannot be validated in isolation, and the main challenge is to select a mutually valid subset of transactions from a given pool.
 
-## Getting Started
+-----
 
-### Prerequisites
+## ✨ Features
 
-- C++ compiler (C++11 or later)
-- CMake (if using CMake build system)
-- OpenSSL library (for cryptographic functions)
+This project implements the `TxHandler` class, which serves as Scrooge's logic engine.
 
-### Building the Project
+### `isValidTx(Transaction tx)`
 
-```bash
-# Clone the repository
-git clone https://github.com/JEET090806/Scrooge-Coin-with-Cpp.git
-cd Scrooge-Coin-with-Cpp
+A method that validates a single transaction based on **five critical rules**:
 
-# Compile the project
-g++ -std=c++11 -o scroogecoin *.cpp -lssl -lcrypto
+1.  All outputs claimed by the transaction's inputs must be in the current UTXO pool.
+2.  The signatures on each input must be valid.
+3.  No UTXO can be claimed multiple times within the same transaction.
+4.  All output values must be non-negative.
+5.  The sum of the input values must be greater than or equal to the sum of the output values.
 
-# Or if using CMake
-mkdir build && cd build
-cmake ..
-make
+### `handleTxs(Transaction[] possibleTxs)`
+
+A method to process a block of potential transactions.
+
+  * It returns a **mutually valid transaction set of maximal size** (one that can't be enlarged by simply adding more transactions from the pool).
+  * It updates its internal UTXO pool to reflect the spent and newly created coins from the accepted transactions.
+
+-----
+
+## 🌊 Process Flow Diagram
+
+The core logic of this project is in the `handleTxs` method. Because some transactions may depend on the outputs of other transactions within the same block, the handler must loop over the list multiple times. It continues looping and adding valid transactions until a full pass is completed where no new transactions can be accepted.
+
+This diagram illustrates the workflow:
+
+```mermaid
+graph TD
+    A[Start handleTxs] --> B[Initialize empty 'acceptedTxs' list];
+    B --> C{Loop as long as new transactions were added in the previous pass};
+    C --► Pass Begins --> D[Iterate through all 'possibleTxs'];
+    D --> E{Is the current transaction<br>valid AND not yet accepted?};
+    E -- Yes --> F[1. Add tx to 'acceptedTxs'<br>2. Update the UTXO Pool<br>3. Note that a change was made this pass];
+    F --> D;
+    E -- No --> D;
+    C -- No more transactions added in a full pass --> G[Return 'acceptedTxs' list];
+    G --> H[End];
 ```
 
-### Running the Application
+-----
 
-```bash
-./scroogecoin
-```
-
-## Usage Examples
-
-### Creating a Transaction
-
-```cpp
-// Create a new transaction
-Transaction tx;
-tx.addInput(previousTxHash, outputIndex);
-tx.addOutput(value, recipientPublicKey);
-tx.addSignature(signature, inputIndex);
-```
-
-### Validating Transactions
-
-```cpp
-// Initialize transaction handler
-TxHandler txHandler(utxoPool);
-
-// Validate and process transactions
-vector<Transaction> validTx = txHandler.handleTxs(proposedTransactions);
-```
-
-## Implementation Details
-
-### Transaction Validation Process
-
-1. **Signature Verification**: Verify all input signatures are valid
-2. **UTXO Existence**: Confirm all referenced outputs exist and are unspent
-3. **Double Spending Check**: Ensure no UTXO is used multiple times
-4. **Value Conservation**: Verify input values ≥ output values
-5. **Non-negative Values**: Ensure all output values are positive
-
-### Data Structures
-
-- **Transaction**: Contains inputs, outputs, and signatures
-- **UTXO**: Represents an unspent transaction output
-- **UTXOPool**: Hash table for efficient UTXO lookup and management
-
-## Testing
-
-The implementation includes comprehensive test cases covering:
-
-- Valid transaction processing
-- Invalid signature detection
-- Double-spending prevention
-- UTXO pool consistency
-- Edge cases and error handling
-
-```bash
-# Run tests (if test framework is included)
-./run_tests
-```
-
-## File Structure
+## 📂 Project Structure
 
 ```
 Scrooge-Coin-with-Cpp/
-├── src/
-│   ├── Transaction.cpp
-│   ├── Transaction.h
-│   ├── UTXO.cpp
-│   ├── UTXO.h
-│   ├── UTXOPool.cpp
-│   ├── UTXOPool.h
-│   ├── TxHandler.cpp
-│   ├── TxHandler.h
-│   └── main.cpp
-├── tests/
-│   └── test_cases.cpp
-├── CMakeLists.txt
-└── README.md
+|-- include/              # Header files (.hpp)
+|   |-- Transaction.hpp
+|   |-- TxHandler.hpp
+|   |-- UTXO.hpp
+|   |-- UTXOPool.hpp
+|-- src/                  # Source files (.cpp)
+|   |-- main.cpp
+|   |-- Transaction.cpp
+|   |-- TxHandler.cpp
+|   |-- UTXOPool.cpp
+|-- build/                # Created by CMake for compiled files
+|-- CMakeLists.txt        # Build instructions for CMake
+|-- README.md             # This file
 ```
 
-## Key Concepts Demonstrated
+-----
 
-- **Blockchain Fundamentals**: Understanding of basic blockchain principles
-- **Cryptographic Signatures**: Implementation of digital signature verification
-- **Transaction Validation**: Comprehensive transaction validation logic
-- **UTXO Model**: Implementation of the unspent transaction output model
-- **Data Structure Design**: Efficient data structures for cryptocurrency operations
+## ⚙️ How to Build and Run
 
-## Educational Context
+### Prerequisites
 
-This project implements concepts from:
-- **Course**: Bitcoin and Cryptocurrency Technologies (Princeton University)
-- **Focus Areas**: 
-  - Cryptographic hash functions
-  - Digital signatures and public key cryptography
-  - Blockchain mechanics
-  - Transaction validation
-  - Consensus mechanisms (simplified)
+  * A C++ compiler (g++, Clang, etc.)
+  * CMake (version 3.10 or higher)
 
-## Limitations
+### Instructions
 
-As an educational implementation, ScroogeCoin has several limitations compared to real cryptocurrencies:
+1.  **Clone the repository.**
 
-- **Centralized Authority**: Scrooge is a single point of failure
-- **No Mining**: No proof-of-work or consensus mechanism
-- **Simplified Model**: Reduced complexity for learning purposes
-- **No Network Layer**: No peer-to-peer networking implementation
+2.  **Create a build directory.** Open a terminal in the project's root folder (`Scrooge-Coin-with-Cpp/`) and run:
 
-## Contributing
+    ```bash
+    mkdir build
+    cd build
+    ```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
+3.  **Configure the project with CMake.**
 
-## License
+    ```bash
+    cmake ..
+    ```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+4.  **Compile the code.**
 
-## Acknowledgments
+    ```bash
+    make
+    ```
 
-- Princeton University's "Bitcoin and Cryptocurrency Technologies" course
-- Course instructors for providing the theoretical foundation
-- OpenSSL library for cryptographic functions
+5.  **Run the simulation\!**
 
-## References
+    ```bash
+    ./scrooge_coin
+    ```
 
-- [Bitcoin and Cryptocurrency Technologies](https://www.coursera.org/learn/cryptocurrency) - Coursera Course
-- [Bitcoin and Cryptocurrency Technologies Textbook](http://bitcoinbook.cs.princeton.edu/)
-- [OpenSSL Documentation](https://www.openssl.org/docs/)
+-----
 
-## Contact
+## 🤝 Contributors
 
-For questions or issues regarding this implementation, please open an issue on GitHub or contact the repository maintainer.
-
----
-
-*This implementation is for educational purposes only and should not be used in production environments.*
+  * **Jeet Pandya** - *Initial Work* - [GitHub Profile](https://www.google.com/search?q=https://github.com/JEET090806)
