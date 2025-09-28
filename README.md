@@ -1,8 +1,6 @@
 # ScroogeCoin C++ Implementation
 
-\<div align="center"\>
-
-\</div\>
+-----
 
 This repository contains a C++ implementation of **ScroogeCoin**, a simplified, centralized cryptocurrency model based on an assignment from the "Bitcoin and Cryptocurrency Technologies" course. The project builds the core logic for a central authority, Scrooge, to process transactions, validate them against a set of rules, and maintain a public ledger.
 
