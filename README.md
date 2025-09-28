@@ -1,1 +1,1 @@
-# Scrooge-Coin-with-C-
+# Scrooge-Coin-with-C++
