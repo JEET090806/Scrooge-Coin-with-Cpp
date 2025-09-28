@@ -179,7 +179,7 @@ Basic validation and testing functionality is included in the main application t
 
 ## 🤝 Contributors
 
-* **Jeet Pandya** - *Initial Work* - [GitHub Profile](https://github.com/JEET090806)
+* **Jeet Pandya** - _https://jeetpandya.web.app_ - [GitHub Profile](https://github.com/JEET090806)
 
 -----
 
