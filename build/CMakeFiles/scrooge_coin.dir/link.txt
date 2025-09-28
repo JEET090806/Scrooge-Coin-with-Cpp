@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/scrooge_coin.dir/src/main.cpp.o CMakeFiles/scrooge_coin.dir/src/Transaction.cpp.o CMakeFiles/scrooge_coin.dir/src/UTXOPool.cpp.o CMakeFiles/scrooge_coin.dir/src/TxHandler.cpp.o -o scrooge_coin 

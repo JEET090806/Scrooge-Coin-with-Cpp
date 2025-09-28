@@ -1,0 +1,3 @@
+/workspaces/Scrooge-Coin-with-Cpp/build/CMakeFiles/scrooge_coin.dir
+/workspaces/Scrooge-Coin-with-Cpp/build/CMakeFiles/edit_cache.dir
+/workspaces/Scrooge-Coin-with-Cpp/build/CMakeFiles/rebuild_cache.dir
