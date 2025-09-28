@@ -136,4 +136,4 @@ Scrooge-Coin-with-Cpp/
 
 ## 🤝 Contributors
 
-  * **Jeet Pandya** - *Initial Work* - [GitHub Profile](https://www.google.com/search?q=https://github.com/JEET090806)
+  * **Jeet Pandya** - *https://jeetpandya.web.app* - [GitHub Profile](https://www.google.com/search?q=https://github.com/JEET090806)
