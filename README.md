@@ -1,1 +1,0 @@
-# Scrooge-Coin-with-Cpp
